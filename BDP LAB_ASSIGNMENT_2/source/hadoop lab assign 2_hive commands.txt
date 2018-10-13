@@ -1,0 +1,24 @@
+CREATE TABLE superheros (id STRING, name STRING, Gender STRING, Eye_color STRING, Race STRING, Hair_color STRING, Height array<INT>, Publisher STRING, Skin_color STRING, Alignment STRING, Weight array<INT>) row format delimited fields terminated by ',' stored as textfile;
+
+load data local inpath '/home/cloudera/Downloads/heroes_information.csv' into table superheros;
+
+
+SELECT name WHERE Gender = 'Male' AND Alignment = 'good';
+
+SELECT name FROM superheros WHERE Race = 'Alien';
+
+SELECT COUNT(Gender),Hair_color FROM superheros WHERE Hair_color = 'No Hair' and Gender='Male' group by Hair_color;
+
+SELECT COUNT(name) FROM superheros WHERE (Height[0] BETWEEN 170 AND 200) AND (Weight[0] BETWEEN 90 AND 100);
+
+SELECT name FROM superheros WHERE Publisher = 'DC Comics';
+
+SELECT * FROM superheros WHERE Race = 'Neyaphem';
+
+SELECT name FROM superheros WHERE Eye_color = 'blue' and Alignment = 'good';
+
+SELECT name FROM superheros WHERE Gender = 'Female' AND Race = 'God / Eternal';
+
+SELECT name FROM superheros WHERE Gender = 'Female' AND Skin_color = 'White';
+
+SELECT COUNT(Gender) FROM superheros WHERE Gender = 'Female' AND Skin_color = 'black';
