@@ -1,0 +1,32 @@
+q1:   df1.select("Stadium").show(20)
+
+q2:   df1.groupBy("City").count().show(20)
+
+
+q3:// sql query on dataframe
+    
+    df1.createOrReplaceTempView("WorldCupMatches")
+    val sqlDF1 = spark.sql("SELECT Stage, Stadium, City from WorldCupMatches")
+    sqlDF1.show(20)
+
+    df2.createOrReplaceTempView("worldcups")
+    val sqlDF2 = spark.sql("SELECT year, Country, Winner FROM worldcups")
+    sqlDF2.show()
+
+q4:df1.createGlobalTempView("WorldCupMatches")
+    Global temporary view is tied to a system preserved database `global_temp`
+    spark.sql("SELECT Stage, Stadium, City, Attendance, MatchID FROM global_temp.WorldCupMatches").show(20)
+
+
+q5: val y = spark.sql("SELECT Year, Country, GoalsScored From worldcups WHERE GoalsScored>100")
+    y.show()
+
+q6: val Pattern_reg = spark.sql("SELECT * from WorldCupMatches WHERE Stage LIKE 'Final' AND Home_Team_Initials LIKE 'ENG'")
+    Pattern_reg.show()
+
+q7: val Avg_goals = spark.sql("SELECT Home_Team_Name AS Team, ROUND(AVG(Home_Team_Goals),0) AS average_goals FROM WorldCupMatches GROUP BY Home_TEam_Name")
+    Avg_goals.show()
+
+q8: val Goals = spark.sql("SELECT Stage,Stadium,City,Home_Team_Name FROM WorldCupMatches WHERE Home_Team_Goals >=5 AND <=10")
+    Goals.show()
+
