@@ -1,0 +1,130 @@
+q1:   df1.select("Stadium").show(20)
+
+q2:   df1.groupBy("City").count().show(20)
+
+
+q3:// sql query on dataframe
+    
+    df1.createOrReplaceTempView("WorldCupMatches")
+    val sqlDF1 = spark.sql("SELECT Stage, Stadium, City from WorldCupMatches")
+    sqlDF1.show(20)
+
+    df2.createOrReplaceTempView("worldcups")
+    val sqlDF2 = spark.sql("SELECT year, Country, Winner FROM worldcups")
+    sqlDF2.show()
+
+q4:df1.createGlobalTempView("WorldCupMatches")
+    Global temporary view is tied to a system preserved database `global_temp`
+    spark.sql("SELECT Stage, Stadium, City, Attendance, MatchID FROM global_temp.WorldCupMatches").show(20)
+
+
+q5: val y = spark.sql("SELECT Year, Country, GoalsScored From worldcups WHERE GoalsScored>100")
+    y.show()
+
+q6: val Pattern_reg = spark.sql("SELECT * from WorldCupMatches WHERE Stage LIKE 'Final' AND Home_Team_Initials LIKE 'ENG'")
+    Pattern_reg.show()
+
+q7: val Avg_goals = spark.sql("SELECT Home_Team_Name AS Team, ROUND(AVG(Home_Team_Goals),0) AS average_goals FROM WorldCupMatches GROUP BY Home_TEam_Name")
+    Avg_goals.show()
+
+q8: val Goals = spark.sql("SELECT Stage,Stadium,City,Home_Team_Name FROM WorldCupMatches WHERE Home_Team_Goals >=5 AND <=10")
+    Goals.show()
+
+
+q9:  query9 = spark.sql("SELECT Home_Team_Name, MAX(Home_Team_Goals) from WorldCupMatches where Year BETWEEN 2000 AND 2010 GROUP BY Home_Team_Name ORDER BY 2 DESC")
+     query9.show()
+
+
+q10:  query10 = spark.sql("SELECT Home_Team_Name As COUNTRY,COUNT(Home_Team_Goals) AS No_of_Times FROM  where Home_Team_Goals >=4 GROUP BY Home_Team_Name ORDER BY 2 DESC")
+query10.show
+
+***********************************************************************************************************
+
+Query 1:
+BY RDD:
+
+Select Year, Country and Goalsscored using RDD
+
+//select Year ,Country and Goalsscored using RDD
+val wcfileds = wc.map(line => {
+  val fd = line.split(",")
+  (fd(0), fd(1), fd(6))
+})
+
+wcfileds.foreach( x=> println(x._1 + "," + x._2 + "," + x._3))
+
+by DFF:
+Select Year, Country and Goalsscored using DFF
+
+//select Year ,Country and Goalsscored using DFF
+val y = spark.sql("select Year, Country, GoalsScored From worldcups ")
+y.show()
+
+query2:
+by RDD:
+Filter GoalsScored > 100
+
+//RDD get Year Country GoalsScored > 100
+val h = wcfileds.first()
+val wcfileds1  = wcfileds.filter(row => row != h)
+wcfileds1.filter(  _._3.toInt > 100 ).foreach(fd => {
+
+  println(fd._1 + "," + fd._2 + " ," + fd._3)
+})
+
+BY DFF:
+
+//filter by GoalsScored>100 DFF
+import spark.sqlContext.implicits._
+val y1 = y.filter($"GoalsScored" > 100)
+y1.show()
+
+Query3:
+
+
+//How many times each country hosted World Cup using RDD
+println(wcfileds1.groupBy(_._2).foreach( x=> println (x._1 + "," + x._2.size) ))
+
+
+//How many times each country hosted World Cup DFF
+y.groupBy("Country").count().show()
+
+ 
+ 
+Query 4:  
+Average goals out of all the wordcup goals
+
+//Average goals scored using RDD
+val avgValue = wcfileds1.map(_._3.toInt).sum() / wcfileds1.count()
+println("Average = " + avgValue.round )
+
+
+//Average goals scored using RDD
+val Avg_goals = spark.sql("SELECT ROUND(AVG(GoalsScored),0) AS average_goals FROM worldcups ")
+Avg_goals.show()
+
+ 
+
+Query 5: 
+What are the years USA hosted worldcup
+
+//Years USA hosted world cup RDD
+val yu = wcfileds1.filter(_._2.equals("USA"))
+yu.foreach(fd => {
+  println(fd._1 + "," + fd._2 + " ," + fd._3)
+})
+
+
+//Years USA hosted world cup DFF
+y.filter(($"Country" === "USA")).show()
+
+
+ 
+ 
+
+
+
+
+
+
+
